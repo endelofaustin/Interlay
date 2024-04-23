@@ -15,8 +15,26 @@ Then in the bottom pane you can see where it says type your translation. This is
 
 In order to run the application you will need to install python and pip.
 
-Once you have pip installed you will need to install the requirements.txt. 
-You can do so with the following command:
+And then you will have to start a python virtual environment with the following command:
+
+python3 -m venv venv 
+
+This will run python3 code that uses a venv (virtual environment) and creates a directory called venv for the libraries you need for a venv. 
+
+Then you will have to run the following command:
+
+source /venv/bin/activate
+
+This will activate your virtual environment. 
+
+If you need to stop the virtual environment for some reason you will have to run this command:
+
+deactivate
+
+Once you have pip installed you will need to install the requirements.txt.
+
+With yoiur virtual environment running 
+Install your dependencies with this command
 
 pip install -r requirements.txt
 
