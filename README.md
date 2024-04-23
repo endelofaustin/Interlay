@@ -14,10 +14,12 @@ The application is not complicated and it does not look complicated either:
 The application is simple to use. You choose a book by clicking where the word IJohn appears. 
 You select the book of the bible you want to write a translation for. then you will type in the citation chapter is a number and verse. For a range of verses use start-end. Chapter 1 and 1-3 would give you I John 1:1-3. 
 
+
+
 Then in the bottom pane you can see where it says type your translation. This is where you type whatever you want. When you click save it will save the words that you have in the text box as a text file in the translation directory. The translation will be titled book.chapter.verse_range.txt. 
 
 
-## Gettting Started ##
+## Getting Started ##
 
 In order to run the application you will need to install python and pip.
 
@@ -25,7 +27,7 @@ In order to run the application you will need to install python and pip.
 
 And then you will have to start a python virtual environment with the following command:
 
-python3 -m venv venv 
+python3 -m venv venv
 
 
 
@@ -48,6 +50,7 @@ deactivate
 
 
 Once you have pip installed you will need to install the requirements.txt.
+
 
 With your virtual environment running 
 Install your dependencies with this command
