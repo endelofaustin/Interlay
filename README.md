@@ -33,9 +33,13 @@ deactivate
 
 Once you have pip installed you will need to install the requirements.txt.
 
-With yoiur virtual environment running 
+With your virtual environment running 
 Install your dependencies with this command
 
 pip install -r requirements.txt
+
+To run the application run in a pyhton virtual environment:
+python colorful_interlay_new_testament_viewer.py
+
 
 After this you should be good to go! 
