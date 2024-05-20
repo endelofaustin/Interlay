@@ -1,14 +1,17 @@
+import os
+import xml.etree.ElementTree as ET
+import requests
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout
 from kivy.uix.spinner import Spinner
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
+from kivy.uix.label import Label
 from kivy.core.text import LabelBase
 from kivy.core.window import Window
-from kivy.uix.popup import Popup
-from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
-import os
+from kivy.uix.popup import Popup
 
 # Register the Greek font (ensure 'greek.ttf' is in your application directory)
 LabelBase.register(name='Greek', fn_regular='greek.ttf')
@@ -16,21 +19,41 @@ LabelBase.register(name='Greek', fn_regular='greek.ttf')
 # Set the background color of the window
 Window.clearcolor = (0.1, 0.1, 0.1, 1)  # Dark background
 
+
 class NewTestamentViewerApp(App):
     def build(self):
-        root_layout = BoxLayout(orientation='vertical')
-        scroll_view = ScrollView(size_hint=(1, 1), bar_width=10, bar_color=(0.2, 0.6, 0.8, 1))
-        
-        content_layout = BoxLayout(orientation='vertical', padding=20, spacing=10, size_hint_y=None)
+        # Set the app icon
+        self.icon = 'greek_bible_icon.png'
+
+        # Main layout
+        root_layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
+
+        # Scrollable content layout
+        scroll_view = ScrollView(size_hint=(1, 1))
+        content_layout = BoxLayout(orientation='vertical', padding=10, spacing=10, size_hint_y=None)
         content_layout.bind(minimum_height=content_layout.setter('height'))
+
+        # Scrollable Greek text display
+        greek_text_scroll = ScrollView(size_hint=(1, None), height=400)  # Increased height for better visibility
+        self.greek_text_display = TextInput(
+            readonly=True,  # Allow only copying
+            font_name='Greek',
+            font_size=36,  # Larger text
+            background_color=(0.1, 0.1, 0.1, 1),  # Dark background
+            foreground_color=(1, 1, 1, 1),
+            size_hint_y=None,
+            height=400,
+            multiline=True  # Allow multiline text
+        )
+        self.greek_text_display.bind(minimum_height=self.greek_text_display.setter('height'))
+        greek_text_scroll.add_widget(self.greek_text_display)
 
         # Spinner for selecting the book
         self.book_spinner = Spinner(
             text='1John',
             values=('1Cor', '1John', '1Pet', '1Thess', '1Tim', '2Cor', '2John', '2Pet', '2Thess', '2Tim', '3John', 'Acts', 'Col', 'Eph', 'Gal', 'Heb', 'James', 'Jude', 'John', 'Luke', 'Mark', 'Matt', 'Phil', 'Phlm', 'Rev', 'Rom', 'Titus'),
-            size_hint=(None, None),
-            size=(220, 44),
-            pos_hint={'center_x': 0.5},
+            size_hint=(1, None),
+            height=44,
             background_color=(0.2, 0.6, 0.8, 1),  # Modern blue
             color=(1, 1, 1, 1)
         )
@@ -65,25 +88,21 @@ class NewTestamentViewerApp(App):
         )
         self.load_button.bind(on_press=self.load_greek_text)
 
-        # Greek text display
-        self.greek_text_display = TextInput(
+        # Translated text display
+        self.translated_text_display = TextInput(
             readonly=True,
             size_hint_y=None,
-            height=500,
-            font_name='Greek',
-            font_size=36,  # Larger text
+            height=200,
+            font_size=24,  # Larger text
             background_color=(0.1, 0.1, 0.1, 1),  # Dark background
             foreground_color=(1, 1, 1, 1)
         )
-
-        # Add spacing before the translation input
-        self.spacing_widget = BoxLayout(size_hint_y=None, height=20)
 
         # Translation input
         self.translation_input = TextInput(
             hint_text='Type your translation here',
             size_hint_y=None,
-            height=150,
+            height=100,
             font_size=24,  # Larger text
             background_color=(0.2, 0.2, 0.2, 1),  # Dark input field
             foreground_color=(1, 1, 1, 1),
@@ -100,20 +119,48 @@ class NewTestamentViewerApp(App):
         )
         self.save_button.bind(on_press=self.save_translation)
 
-        # Assemble the main layout
-        content_layout.add_widget(self.greek_text_display)
+        # Button to translate the Greek text
+        self.translate_button = Button(
+            text='Translate It',
+            size_hint=(1, None),
+            height=50,
+            background_color=(0.2, 0.6, 0.8, 1),  # Modern blue
+            color=(1, 1, 1, 1)
+        )
+        self.translate_button.bind(on_press=self.translate_text)
+
+        # Label to display the Greek word definition
+        self.definition_label = Label(
+            text='',
+            size_hint=(1, None),
+            height=50,
+            font_size=24,
+            color=(1, 1, 1, 1),
+            text_size=(Window.width, None)
+        )
+
+        # Assemble the content layout
+        content_layout.add_widget(greek_text_scroll)
         content_layout.add_widget(self.book_spinner)
         content_layout.add_widget(self.chapter_input)
         content_layout.add_widget(self.verse_input)
         content_layout.add_widget(self.load_button)
-        content_layout.add_widget(self.spacing_widget)  # Add the spacing widget
+        content_layout.add_widget(self.translated_text_display)
         content_layout.add_widget(self.translation_input)
         content_layout.add_widget(self.save_button)
+        content_layout.add_widget(self.translate_button)
+        content_layout.add_widget(self.definition_label)
 
+        # Add content layout to the scroll view
         scroll_view.add_widget(content_layout)
+
+        # Add scroll view to the root layout
         root_layout.add_widget(scroll_view)
 
         return root_layout
+
+    def _update_greek_text_height(self, instance, value):
+        instance.height = max(400, instance.minimum_height)
 
     def load_greek_text(self, instance):
         book = self.book_spinner.text
@@ -170,15 +217,45 @@ class NewTestamentViewerApp(App):
         popup_layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
         popup_label = Label(text=message, size_hint_y=None, height=40, color=(1, 1, 1, 1))
         close_button = Button(text='Close', size_hint_y=None, height=40, background_color=(0.2, 0.6, 0.8, 1), color=(1, 1, 1, 1))
+        close_button.bind(on_press=lambda *args: popup.dismiss())
+
         popup_layout.add_widget(popup_label)
         popup_layout.add_widget(close_button)
-        popup = Popup(title=title, content=popup_layout, size_hint=(None, None), size=(300, 200), background_color=(0.1, 0.1, 0.1, 1))
-        close_button.bind(on_press=popup.dismiss)
+
+        popup = Popup(title=title, content=popup_layout, size_hint=(0.75, 0.5))
         popup.open()
 
-    def on_start(self):
-        # Set the window icon
-        Window.set_icon('greek_bible_icon.png')
+    def translate_text(self, instance):
+        greek_text = self.greek_text_display.text
+        if not greek_text:
+            self.show_popup("Error", "Please load Greek text first.")
+            return
+
+        # DeepL API URL and headers
+        url = "https://api-free.deepl.com/v2/translate"
+        headers = {
+            "Authorization": "DeepL-Auth-Key 9a0c4f65-1001-4bb0-a537-68664c26e76b:fx"
+        }
+
+        # Payload for DeepL API
+        payload = {
+            "text": greek_text,
+            "target_lang": "EN"
+        }
+
+        try:
+            # Make the API request
+            response = requests.post(url, headers=headers, data=payload)
+            response.raise_for_status()  # Raise an exception for HTTP errors
+
+            # Get the translated text from the response
+            translated_text = response.json()["translations"][0]["text"]
+
+            # Set the translated text in the translated text display field
+            self.translated_text_display.text = translated_text
+
+        except requests.exceptions.RequestException as e:
+            self.show_popup("Error", f"An error occurred: {e}")
 
 if __name__ == '__main__':
     NewTestamentViewerApp().run()
