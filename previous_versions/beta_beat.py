@@ -273,4 +273,4 @@ class NewTestamentViewerApp(App):
         self.logger.info(f"Popup shown: {title} - {message}")
 
 if __name__ == '__main__':
-    NewTestamentViewerApp().run()   
+    NewTestamentViewerApp().run()        
