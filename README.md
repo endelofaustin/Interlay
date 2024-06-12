@@ -7,7 +7,8 @@ The application is not complicated and it does not look complicated either:
 
 
 
-<img width="801" alt="image" src="https://github.com/endelofaustin/Interlay/assets/53027219/b12cfb80-43d3-43b9-a4e6-98e09fcd684d">
+<img width="802" alt="image" src="https://github.com/endelofaustin/Interlay/assets/53027219/f94f9495-aa5a-4aee-89c7-82a3d40d1087">
+
 
 
 
@@ -60,8 +61,23 @@ pip install -r requirements.txt
 
 
 To run the application run in a pyhton virtual environment:
-python colorful_interlay_new_testament_viewer.py
+python main.py
 
+## Android App For Phones:
+
+To get the app running on your phone you will need to follow the following steps.
+
+1. You will need to go to the directory of your app on your computer and run the following android build command using buildozer.
+
+buildozer -v android debug 
+
+This will build the apk in your bin directory i.e. -----> present_working_directory_of_app/bin/app.apk
+
+Then in order to run on an adroid phone I have been upploading the apk to my google drive and activating / installing it from my device. 
+
+In order to do that make you you enable installing unknown apps in the settings of your adroid phone. 
+
+At some point I may venture down the route for Ios but at this time I have not began that endeavor. 
 
 
 
